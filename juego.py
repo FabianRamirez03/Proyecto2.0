@@ -10,6 +10,7 @@ import os
 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
+GREEN = (0,255,0)
 L = 20
 
 # Clase Juego:
@@ -70,11 +71,12 @@ class Juego:
 				self.tiempo = time
 				if self.modo == "Single":
 					if self.tamaño == None:
-						self.barra1 = Barra(1,2,TAMAÑO_BARRA_1) 
-						self.barra2 = Barra(38,2,TAMAÑO_BARRA_1)
+						self.barra1 = Barra(1,2,TAMAÑO_BARRA_1,1) 
+						self.barra2 = Barra(38,2,TAMAÑO_BARRA_1,1)
+						self.trampolin = Barra(20,2,20,2)
 					else:
-						self.barra1 = Barra(1,2,self.tamaño) 
-						self.barra2 = Barra(38,2,self.tamaño)
+						self.barra1 = Barra(1,2,self.tamaño,1) 
+						self.barra2 = Barra(38,2,self.tamaño,1)
 					if self.versus == "humano":
 						self.CPU = 0
 					elif self.versus == "cpu":
@@ -85,8 +87,8 @@ class Juego:
 						self.barra1 = Barra_doble(1,3,9,13,TAMAÑO_BARRA_1)
 						self.barra2 = Barra_doble(38,12,30,3,TAMAÑO_BARRA_1)
 					else:
-						self.barra1 = Barra(1,2,self.tamaño) 
-						self.barra2 = Barra(38,2,self.tamaño)
+						self.barra1 = Barra(1,2,self.tamaño,1) 
+						self.barra2 = Barra(38,2,self.tamaño,1)
 					if self.versus == "humano":
 						# Si se escoje "humano" no se llama la función cpu()
 						self.CPU = 0
@@ -110,6 +112,8 @@ class Juego:
 				if self.matriz[fila][columna] == 0:
 					# Si el cierta posición de la matriz hay un 0, se pinta de color negro
 					pygame.draw.rect(self.pantalla, BLACK, [L* columna,L * fila,L,L])
+				elif self.matriz[fila][columna] == 2:
+					pygame.draw.rect(self.pantalla, GREEN, [L* columna,L * fila,L,L])
 				else:
 					# Si el cierta posición de la matriz hay un 0, se pinta de color blanco
 					# Esto es para la bola y las barras
@@ -150,16 +154,16 @@ class Juego:
 				if self.nivel == 1:
 					self.tiempo = TIEMPO_NIVEL1
 					if self.modo == "Single":
-						self.barra1 = Barra(1,2,TAMAÑO_BARRA_1) 
-						self.barra2 = Barra(38,2,TAMAÑO_BARRA_1)
+						self.barra1 = Barra(1,2,TAMAÑO_BARRA_1,1) 
+						self.barra2 = Barra(38,2,TAMAÑO_BARRA_1,1)
 					else:
 						self.barra1 = Barra_doble(1,3,9,13,TAMAÑO_BARRA_1)
 						self.barra2 = Barra_doble(38,12,30,3,TAMAÑO_BARRA_1)
 				if self.nivel == 2:
 					self.tiempo = TIEMPO_NIVEL2
 					if self.modo == "Single":
-						self.barra1 = Barra(1,2,TAMAÑO_BARRA_2) 
-						self.barra2 = Barra(38,2,TAMAÑO_BARRA_2)
+						self.barra1 = Barra(1,2,TAMAÑO_BARRA_2,1) 
+						self.barra2 = Barra(38,2,TAMAÑO_BARRA_2,1)
 					else:
 						self.barra1 = Barra_doble(1,3,9,13,TAMAÑO_BARRA_2)
 						self.barra2 = Barra_doble(38,12,30,3,TAMAÑO_BARRA_2)
@@ -167,8 +171,8 @@ class Juego:
 				if self.nivel == 3:
 					self.tiempo = TIEMPO_NIVEL3
 					if self.modo == "Single":
-						self.barra1 = Barra(1,2,TAMAÑO_BARRA_3) 
-						self.barra2 = Barra(38,2,TAMAÑO_BARRA_3)
+						self.barra1 = Barra(1,2,TAMAÑO_BARRA_3,1) 
+						self.barra2 = Barra(38,2,TAMAÑO_BARRA_3,1)
 					else:
 						self.barra1 = Barra_doble(1,3,9,13,TAMAÑO_BARRA_3)
 						self.barra2 = Barra_doble(38,12,30,3,TAMAÑO_BARRA_3)
@@ -193,6 +197,8 @@ class Juego:
 						self.barra1.mover(1,self.matriz)
 					elif event.key == pygame.K_s:
 						self.barra1.mover(-1,self.matriz)
+					elif event.key == pygame.K_p:
+						self.pausa()
 					elif event.key == pygame.K_ESCAPE:
 						pygame.quit()
 						quit()
@@ -226,3 +232,22 @@ class Juego:
 		self.barra1.posicionar(self.matriz)
 		self.barra2.posicionar(self.matriz)
 		pygame.display.update()
+
+	def pausa(self):
+		pausado = True
+		
+		while pausado:
+			pantalla = pygame.display.set_mode((ANCHO,LARGO))
+			font = pygame.font.Font(None, 25)
+			for x in range (self.FILAS):
+				score_text = font.render(str(self.matriz[x]), True,(WHITE))
+				# Se coloca el texto en la pantalla
+				pantalla.blit(score_text, (20, 20*x))
+			pygame.display.update()
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT: #is le da X, cierra todo
+					pygame.quit()
+					quit()
+				if event.type == pygame.KEYDOWN: #al presionar una tecla
+					if event.key == pygame.K_p:
+						pausado = False
